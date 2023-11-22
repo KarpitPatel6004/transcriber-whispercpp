@@ -1,0 +1,36 @@
+version: '3'
+services:
+  flask-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.flask
+    ports:
+      - "5000:5000"
+    depends_on:
+      - celery-worker
+    volumes:
+      - shared-data:/app/uploads
+
+  streamlit-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    ports:
+      - "8501:8501"
+    volumes:
+      - shared-data:/app/uploads
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.celery
+    depends_on:
+      - redis  # or whatever your Celery broker is
+    volumes:
+      - shared-data:/app/uploads
+
+  redis:
+    image: "redis:alpine"
+
+volumes:
+  shared-data:
